@@ -9,11 +9,11 @@ using OnlineChatEnvironment.Data;
 
 #nullable disable
 
-namespace OnlineChatEnvironment.Data.Migrations
+namespace OnlineChatEnvironment.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230514173828_baseLayoutV2")]
-    partial class baseLayoutV2
+    [Migration("20230514210932_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -164,6 +164,10 @@ namespace OnlineChatEnvironment.Data.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Type")
                         .HasColumnType("int");

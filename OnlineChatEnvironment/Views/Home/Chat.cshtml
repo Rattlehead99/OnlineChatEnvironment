@@ -1,0 +1,19 @@
+﻿@model OnlineChatEnvironment.Data.Models.Chat
+
+<div class="chat-body">
+    @foreach (var message in Model.Messages)
+    {
+        <div class="message">
+            <header>@message.Name:</header>
+            <p>@message.Text</p>
+            <footer>@message.Timestamp</footer>
+        </div>
+    }
+    
+</div>
+    <form class="chat-input" asp-controller="Home" asp-action="CreateMessage">
+    <input type="text" name="message">
+        <input type="hidden" value="@Model.Id" name="ChatId">
+    <button type="submit">Send</button>
+    </form>
+

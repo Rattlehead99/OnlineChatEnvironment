@@ -53,6 +53,7 @@ h1{
 .side-menu {
     background-color: #443554;
     min-width: 100px;
+    max-width: 100px;
     z-index: 50;
     box-shadow: 1px 0 2px 0 gray;
     display: flex;
@@ -77,6 +78,7 @@ h1{
     border-radius: 5px;
     box-shadow: 0 1px 3px 1px #333;
     background-color: #57446b;
+    text-align: center;
 }
 
 .room-button:hover {

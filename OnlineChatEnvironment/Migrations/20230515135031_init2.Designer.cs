@@ -9,11 +9,11 @@ using OnlineChatEnvironment.Data;
 
 #nullable disable
 
-namespace OnlineChatEnvironment.Data.Migrations
+namespace OnlineChatEnvironment.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230514173332_baseLayout")]
-    partial class baseLayout
+    [Migration("20230515135031_init2")]
+    partial class init2
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -165,6 +165,10 @@ namespace OnlineChatEnvironment.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
@@ -179,7 +183,7 @@ namespace OnlineChatEnvironment.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("ChatId")
+                    b.Property<Guid>("ChatId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
@@ -190,7 +194,7 @@ namespace OnlineChatEnvironment.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("Timestamps")
+                    b.Property<DateTime>("Timestamp")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
@@ -324,9 +328,13 @@ namespace OnlineChatEnvironment.Data.Migrations
 
             modelBuilder.Entity("OnlineChatEnvironment.Data.Models.Message", b =>
                 {
-                    b.HasOne("OnlineChatEnvironment.Data.Models.Chat", null)
+                    b.HasOne("OnlineChatEnvironment.Data.Models.Chat", "Chat")
                         .WithMany("Messages")
-                        .HasForeignKey("ChatId");
+                        .HasForeignKey("ChatId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Chat");
                 });
 
             modelBuilder.Entity("OnlineChatEnvironment.Data.Models.User", b =>

@@ -8,7 +8,7 @@ using OnlineChatEnvironment.Data;
 
 #nullable disable
 
-namespace OnlineChatEnvironment.Data.Migrations
+namespace OnlineChatEnvironment.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     partial class ApplicationDbContextModelSnapshot : ModelSnapshot
@@ -163,6 +163,10 @@ namespace OnlineChatEnvironment.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
@@ -171,13 +175,31 @@ namespace OnlineChatEnvironment.Data.Migrations
                     b.ToTable("Chats");
                 });
 
+            modelBuilder.Entity("OnlineChatEnvironment.Data.Models.ChatUser", b =>
+                {
+                    b.Property<Guid>("ChatId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Role")
+                        .HasColumnType("int");
+
+                    b.HasKey("ChatId", "UserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("ChatUsers");
+                });
+
             modelBuilder.Entity("OnlineChatEnvironment.Data.Models.Message", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("ChatId")
+                    b.Property<Guid>("ChatId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
@@ -188,7 +210,7 @@ namespace OnlineChatEnvironment.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("Timestamps")
+                    b.Property<DateTime>("Timestamp")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
@@ -320,11 +342,34 @@ namespace OnlineChatEnvironment.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("OnlineChatEnvironment.Data.Models.ChatUser", b =>
+                {
+                    b.HasOne("OnlineChatEnvironment.Data.Models.Chat", "Chat")
+                        .WithMany()
+                        .HasForeignKey("ChatId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("OnlineChatEnvironment.Data.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Chat");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("OnlineChatEnvironment.Data.Models.Message", b =>
                 {
-                    b.HasOne("OnlineChatEnvironment.Data.Models.Chat", null)
+                    b.HasOne("OnlineChatEnvironment.Data.Models.Chat", "Chat")
                         .WithMany("Messages")
-                        .HasForeignKey("ChatId");
+                        .HasForeignKey("ChatId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Chat");
                 });
 
             modelBuilder.Entity("OnlineChatEnvironment.Data.Models.User", b =>

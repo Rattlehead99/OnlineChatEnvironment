@@ -24,7 +24,8 @@ namespace OnlineChatEnvironment.ViewComponents
 
             var chats = db.ChatUsers
                 .Include(x => x.Chat)
-                .Where(x => x.UserId == userId)
+                .Where(x => x.UserId == userId 
+                    && x.Chat.Type == Data.Models.ChatType.Room)
                 .Select(chatUsers => chatUsers.Chat)
                 .ToList();
 

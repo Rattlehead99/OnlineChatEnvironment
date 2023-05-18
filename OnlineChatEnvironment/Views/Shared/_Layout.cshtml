@@ -15,7 +15,6 @@
 <body>
     <header>
         <nav class="navbar">
-
             <a class="" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
 
             <ul class="navbar-nav">
@@ -27,9 +26,11 @@
                 </li>
             </ul>
             <partial name="_LoginPartial" />
+
+            <a asp-controller="Home" asp-action="Find">Find</a>
+            <a asp-controller="Home" asp-action="Private">Private</a>
         </nav>
     </header>
-
 
     <div class="main">
         @if (User.Identity.IsAuthenticated)

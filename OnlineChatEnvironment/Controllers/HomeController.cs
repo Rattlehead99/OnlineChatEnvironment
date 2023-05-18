@@ -33,6 +33,53 @@ namespace OnlineChatEnvironment.Controllers
             return View(chats);
         }
 
+        public async Task<IActionResult> CreatePrivateRoom(Guid userId)
+        {
+            var chat = new Chat
+            {
+                Type = ChatType.Private
+            };
+
+            chat.Users.Add(new ChatUser
+            {
+                UserId = userId,
+
+            });
+
+            chat.Users.Add(new ChatUser
+            {
+                UserId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value)
+
+            });
+
+            db.Chats.Add(chat);
+
+            await db.SaveChangesAsync();
+
+            return View("Chat", new {id = chat.Id});
+        }
+
+        public IActionResult Find()
+        {
+            var users = db.Users
+                          .Where(x => x.Id != Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
+                          .ToList();
+
+            return View(users);
+        }
+
+        public IActionResult Private()
+        {
+            var chats = db.Chats
+                .Include(x => x.Users)
+                .ThenInclude(x => x.User)
+                .Where(x => x.Type == ChatType.Private
+                    && x.Users.Any(y => y.UserId == Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value)))
+                .ToList();
+
+            return View(chats);
+        }
+
         public IActionResult Privacy()
         {
             return View();

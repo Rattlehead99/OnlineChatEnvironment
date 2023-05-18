@@ -11,9 +11,11 @@
     }
 
 </div>
-<form class="chat-input" asp-controller="Home" asp-action="CreateMessage">
+<form class="chat-input" onsubmit="sendMessage(event)" asp-controller="Home" asp-action="CreateMessage">
     <input type="text" name="message">
     <input type="hidden" value="@Model.Id" name="ChatId">
+    <input type="hidden" value="@Model.Name" name="roomName">
+    <input type="text" name="message" id="message-input" />
     <button type="submit">Send</button>
 </form>
 
@@ -30,17 +32,36 @@
 
         connection.on("RecieveMessage", function (data) {
             console.log(data);
+            
+            var message = document.createElement("div")
+            message.classList.add('message')
+            
+            var header = document.createElement("header")
+            header.appendChild(document.createTextNode(data.name))
+            
+            var p = document.createElement("p")
+            p.appendChild(document.createTextNode(data.text))
+
+            var footer = document.createElement("footer")
+            footer.appendChild(document.createTextNode(data.timestamp))
+
+            message.appendChild(header);
+            message.appendChild(p);
+            message.appendChild(footer);
+
+            document.querySelector('.chat-body').append(message);
+
         })
 
         var joinRoom = function () {
             //axios.post(`/Chat/JoinRoom/${_connectionId}/{@Model.Name}`)
-            var url = '/Chat/JoinRoom/' + _connectionId + '/{@Model.Name}'
+            var url = '/Chat/JoinRoom/' + _connectionId + '/{@Model.Id}'
             axios.post(url, null)
                 .then(res => {
                     console.log("Room Joined!", res);
                 })
                 .catch(err => {
-                    console.error("Failed to join Room!", res);
+                    console.error("Failed to join Room!", err);
                 })
         }
 
@@ -62,11 +83,23 @@
             var sendMessage = function(event)
             {
                 event.preventDefault();
+
+                var data = new FormData(event.target);
+
+                document.getElementById('message-input').value = '';
+
+                axios.post('/Chat/SendMessage', data)
+                .then(res => 
+                    {
+                        console.log("Message sent!")
+                    })
+                .catch(err =>
+                {
+                    console.log("Couldn't send message")
+                })
             }
-
-            form = event.target;
-
-                    //joinRoom();
+             
+            //joinRoom();
 
     </script>
 }

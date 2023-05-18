@@ -26,7 +26,7 @@ namespace OnlineChatEnvironment.Controllers
             return Ok();
         }
 
-        [HttpPost("[action]/{connectionId}/{roomName}")]
+        [HttpPost("[action]")]
         public async Task<IActionResult> LeaveRoom(string connectionId, string roomName)
         {
             await chat.Groups.RemoveFromGroupAsync(connectionId, roomName);
@@ -47,7 +47,13 @@ namespace OnlineChatEnvironment.Controllers
             db.Messages.Add(messageToSend);
             await db.SaveChangesAsync();
 
-            await chat.Clients.Group(roomName).SendAsync("RecieveMessage", messageToSend);
+            //await chat.Clients.Group(roomName).SendAsync("RecieveMessage", messageToSend);
+            await chat.Clients.Group(roomName).SendAsync("RecieveMessage", new
+            {
+                Text = messageToSend.Text,
+                Name =messageToSend.Name,
+                TimeStamp = messageToSend.Timestamp.ToString("dd/MM/yyyy hh:mm:ss")
+            });
             
         
             return Ok();

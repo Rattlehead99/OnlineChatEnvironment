@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 using OnlineChatEnvironment.Data;
 using OnlineChatEnvironment.Data.Models;
 using OnlineChatEnvironment.Hubs;
@@ -31,6 +32,8 @@ namespace OnlineChatEnvironment
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
             builder.Services.AddSignalR();
+
+            builder.Services.AddMvc().AddNewtonsoftJson(option => option.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
 
             builder.Services.Configure<IdentityOptions>(options =>
             {

@@ -20,7 +20,7 @@ namespace OnlineChatEnvironment.ViewComponents
             {
 
             }
-            var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var userId = Guid.Parse(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
             var chats = db.ChatUsers
                 .Include(x => x.Chat)

@@ -24,7 +24,7 @@ namespace OnlineChatEnvironment.Controllers
         public IActionResult Index()
         {
 
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
             var chats = db.Chats
                 .Include(x => x.Users)
                 .Where(x => !x.Users.Any(y => y.UserId == userId))
@@ -50,7 +50,7 @@ namespace OnlineChatEnvironment.Controllers
             chat.Users.Add(new ChatUser
             {
 
-                UserId = User.FindFirst(ClaimTypes.NameIdentifier).Value,
+                UserId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value),
                 Role = UserRole.Admin
             });
 
@@ -71,18 +71,18 @@ namespace OnlineChatEnvironment.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateMessage(Guid chatId, string messageText)
+        public async Task<IActionResult> CreateMessage(Guid chatId, string message)
         {
 
-            var message = new Message
+            var messageText = new Message
             {
                 ChatId = chatId,
-                Text = messageText,
+                Text = message,
                 Name = User.Identity.Name,
                 Timestamp = DateTime.UtcNow
             };
 
-            db.Messages.Add(message);
+            db.Messages.Add(messageText);
             await db.SaveChangesAsync();
 
             return RedirectToAction("Chat", new { id = chatId});
@@ -94,7 +94,7 @@ namespace OnlineChatEnvironment.Controllers
             var chatUser = new ChatUser
             {
                 ChatId = chatId,
-                UserId = User.FindFirst(ClaimTypes.NameIdentifier).Value,
+                UserId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value),
                 Role = UserRole.Member
 
             };
@@ -112,7 +112,7 @@ namespace OnlineChatEnvironment.Controllers
             var chatUser = new ChatUser
             {
                 ChatId = chatId,
-                UserId = User.FindFirst(ClaimTypes.NameIdentifier).Value,
+                UserId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value),
                 Role = UserRole.Member
             };
 

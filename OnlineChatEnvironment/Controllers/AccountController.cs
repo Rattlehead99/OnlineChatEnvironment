@@ -4,6 +4,7 @@ using OnlineChatEnvironment.Data.Models;
 
 namespace OnlineChatEnvironment.Controllers
 {
+    [Route("[controller]/[action]")]
     public class AccountController : Controller
     {
         private SignInManager<User> signInManager;
@@ -36,7 +37,7 @@ namespace OnlineChatEnvironment.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            return RedirectToAction("Login, Account");
+            return RedirectToAction("Login", "Account");
         }
 
         public IActionResult Register()
@@ -61,14 +62,15 @@ namespace OnlineChatEnvironment.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            return RedirectToAction("Register, Account");
+            return RedirectToAction("Register", "Account");
         }
 
+        
         public async Task<IActionResult> Logout()
         {
             await signInManager.SignOutAsync();
 
-            return RedirectToAction("Login, Account");
+            return RedirectToAction("Login", "Account");
         }
     }
 }

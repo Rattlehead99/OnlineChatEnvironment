@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using OnlineChatEnvironment.Data;
 using OnlineChatEnvironment.Data.Models;
+using OnlineChatEnvironment.Hubs;
 
 namespace OnlineChatEnvironment
 {
@@ -18,9 +20,17 @@ namespace OnlineChatEnvironment
                 options.UseSqlServer(connectionString));
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-            builder.Services.AddIdentity<User, IdentityRole<Guid>>(options => options.SignIn.RequireConfirmedAccount = false)
+            //builder.Services.AddIdentity<User, IdentityRole<Guid>>(options => options.SignIn.RequireConfirmedAccount = false)
+            //    .AddEntityFrameworkStores<ApplicationDbContext>();
+
+            builder.Services.
+                AddAntiforgery()
+                .AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = false)
+                .AddRoles<IdentityRole<Guid>>()
+                .AddDefaultTokenProviders()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
-                
+
+            builder.Services.AddSignalR();
 
             builder.Services.Configure<IdentityOptions>(options =>
             {
@@ -40,10 +50,17 @@ namespace OnlineChatEnvironment
                 // User settings.
                 options.User.AllowedUserNameCharacters =
                 "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+#";
-                options.User.RequireUniqueEmail = true;
+                options.User.RequireUniqueEmail = false;
+                
+
             });
 
-            builder.Services.AddControllersWithViews();
+            builder.Services.ConfigureApplicationCookie(options => options.LoginPath = "/Account/Login");
+
+            builder.Services.AddControllersWithViews(options =>
+            {
+                options.Filters.Add<AutoValidateAntiforgeryTokenAttribute>();
+            });
             //builder.Services.AddMvc();
 
             var app = builder.Build();
@@ -60,6 +77,8 @@ namespace OnlineChatEnvironment
                 app.UseHsts();
             }
 
+            
+
             app.UseHttpsRedirection();
 
             app.UseStaticFiles();
@@ -68,6 +87,8 @@ namespace OnlineChatEnvironment
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.MapHub<ChatHub>("/chatHub");
 
             app.MapControllerRoute(
                 name: "default",

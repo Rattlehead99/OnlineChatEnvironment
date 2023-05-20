@@ -27,15 +27,11 @@ namespace OnlineChatEnvironment.Controllers
             var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
             var chats = db.Chats
                 .Include(x => x.Users)
-                .Where(x => !x.Users.Any(y => y.UserId == userId))
+                .Where(x => !x.Users
+                    .Any(y => y.UserId == userId))
                 .ToList();
 
             return View(chats);
-        }
-
-        public IActionResult Privacy()
-        {
-            return View();
         }
 
         [HttpPost]
@@ -61,6 +57,23 @@ namespace OnlineChatEnvironment.Controllers
             return RedirectToAction("Index");
         }
 
+        [HttpGet]
+        public async Task<IActionResult> JoinRoom(Guid chatId)
+        {
+            var chatUser = new ChatUser
+            {
+                ChatId = chatId,
+                UserId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value),
+                Role = UserRole.Member
+            };
+
+            db.ChatUsers.Add(chatUser);
+
+            await db.SaveChangesAsync();
+
+            return RedirectToAction("Chat", "Home", new { id = chatId });
+        }
+
         [HttpGet("{id}")]
         public IActionResult Chat(Guid id)
         {
@@ -68,24 +81,6 @@ namespace OnlineChatEnvironment.Controllers
                 .Include(x => x.Messages)
                 .FirstOrDefault(x => x.Id == id);
             return View(chat);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> CreateMessage(Guid chatId, string message)
-        {
-
-            var messageText = new Message
-            {
-                ChatId = chatId,
-                Text = message,
-                Name = User.Identity.Name,
-                Timestamp = DateTime.UtcNow
-            };
-
-            db.Messages.Add(messageText);
-            await db.SaveChangesAsync();
-
-            return RedirectToAction("Chat", new { id = chatId});
         }
 
         [HttpPost]
@@ -106,21 +101,22 @@ namespace OnlineChatEnvironment.Controllers
             return RedirectToAction("Index");
         }
 
-        [HttpGet]
-        public async Task<IActionResult> JoinRoom(Guid chatId)
+        [HttpPost]
+        public async Task<IActionResult> CreateMessage(Guid chatId, string message)
         {
-            var chatUser = new ChatUser
+
+            var messageText = new Message
             {
                 ChatId = chatId,
-                UserId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value),
-                Role = UserRole.Member
+                Text = message,
+                Name = User.Identity.Name,
+                Timestamp = DateTime.UtcNow
             };
 
-            db.ChatUsers.Add(chatUser);
-
+            db.Messages.Add(messageText);
             await db.SaveChangesAsync();
 
-            return RedirectToAction("Chat", "Home", new {id = chatId});
+            return RedirectToAction("Chat", new { id = chatId });
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

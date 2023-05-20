@@ -12,9 +12,9 @@
 
 </div>
 <form class="chat-input" onsubmit="sendMessage(event)" asp-controller="Home" asp-action="CreateMessage">
-    <input type="text" name="message">
-    <input type="hidden" value="@Model.Id" name="ChatId">
-    <input type="hidden" value="@Model.Name" name="roomName">
+    @*<input type="text" name="message">*@
+    <input type="hidden" value="@Model.Id" name="chatId">
+    @* <input type="hidden" value="@Model.Name" name="roomName">*@
     <input type="text" name="message" id="message-input" />
     <button type="submit">Send</button>
 </form>
@@ -22,23 +22,31 @@
 @section scripts
     {
     <script src="~/js/signalr/dist/browser/signalr.min.js"></script>
+    @*<script src="~/js/signalr/dist/browser/signalr.js"></script>*@
+    <script src="~/js/messageBuilder.js"></script>
     <script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script>
 
     <script>
         var connection = new signalR.HubConnectionBuilder()
             .withUrl("/chatHub")
             .build();
+
         var _connectionId = '';
 
         connection.on("RecieveMessage", function (data) {
-            console.log(data);
-            
+            //var message = messageBuilder()
+            //    .createMessage()
+            //    .withHeader(data.name)
+            //    .widthParagraph(data.text)
+            //    .withFooter(data.timestamp)
+            //    .build();
+
             var message = document.createElement("div")
             message.classList.add('message')
-            
+
             var header = document.createElement("header")
             header.appendChild(document.createTextNode(data.name))
-            
+
             var p = document.createElement("p")
             p.appendChild(document.createTextNode(data.text))
 
@@ -50,7 +58,6 @@
             message.appendChild(footer);
 
             document.querySelector('.chat-body').append(message);
-
         })
 
         var joinRoom = function () {
@@ -65,41 +72,38 @@
                 })
         }
 
-            connection.start()
+        connection.start()
             .then(function () {
+                //connection.invoke('joinRoom', '@Model.Id');
                 connection.invoke('getConnectionId')
-                    .then(function (connectionId))
-                {
-                    _connectionId = connectionId
-                    joinRoom()
-                }
+                    .then(function (connectionId) {
+                        _connectionId = connectionId
+                        joinRoom();
+                    })
             })
             .catch(function (err) {
                 console.log(err)
             })
 
-            var form = null;
+        //window.addEventListener('onunload', function () {
+        //    connection.invoke('leaveRoom', '@Model.Id');
+        //})
 
-            var sendMessage = function(event)
-            {
-                event.preventDefault();
+        var form = null;
 
-                var data = new FormData(event.target);
+        var sendMessage = function (event) {
+            event.preventDefault();
 
-                document.getElementById('message-input').value = '';
-
-                axios.post('/Chat/SendMessage', data)
-                .then(res => 
-                    {
-                        console.log("Message sent!")
-                    })
-                .catch(err =>
-                {
+            var data = new FormData(event.target);
+            document.getElementById('message-input').value = '';
+            axios.post('/Chat/SendMessage', data)
+                .then(res => {
+                    console.log("Message sent!")
+                })
+                .catch(err => {
                     console.log("Couldn't send message")
                 })
-            }
-             
-            //joinRoom();
-
+        }
+          //joinRoom();
     </script>
 }

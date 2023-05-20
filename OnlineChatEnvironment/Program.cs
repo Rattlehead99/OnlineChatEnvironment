@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using OnlineChatEnvironment.Data;
 using OnlineChatEnvironment.Data.Models;
 using OnlineChatEnvironment.Hubs;
+using OnlineChatEnvironment.Infrastructure.Services;
 
 namespace OnlineChatEnvironment
 {
@@ -34,6 +35,11 @@ namespace OnlineChatEnvironment
             builder.Services.AddSignalR();
 
             builder.Services.AddMvc().AddNewtonsoftJson(option => option.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
+
+            builder.Services
+                    .AddTransient<ApplicationDbContext, ApplicationDbContext>()
+                    .AddTransient<IChatService, ChatService>();
+            
 
             builder.Services.Configure<IdentityOptions>(options =>
             {

@@ -1,8 +1,7 @@
-﻿@using System.Security.Claims;
-@model IEnumerable<Chat>
+﻿@model IEnumerable<Chat>
 
 @{
-    var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+    var userId = User.GetUserId();
 }
 
 <div class="chat-body">

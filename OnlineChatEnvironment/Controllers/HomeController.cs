@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OnlineChatEnvironment.Data;
 using OnlineChatEnvironment.Data.Models;
+using OnlineChatEnvironment.Infrastructure;
+using OnlineChatEnvironment.Infrastructure.Services;
 using OnlineChatEnvironment.Models;
 using System.Diagnostics;
 using System.Security.Claims;
@@ -10,59 +12,36 @@ using System.Security.Claims;
 namespace OnlineChatEnvironment.Controllers
 {
     [Authorize]
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly ApplicationDbContext db;
+        private readonly IChatService chatService;
 
-        public HomeController(ILogger<HomeController> logger, ApplicationDbContext context)
+        public HomeController(ILogger<HomeController> logger, IChatService service)
         {
             _logger = logger;
-            db = context;
+            chatService = service;
         }
 
         public IActionResult Index()
         {
-
-            var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            var chats = db.Chats
-                .Include(x => x.Users)
-                .Where(x => !x.Users.Any(y => y.UserId == userId))
-                .ToList();
+            var chats = chatService.GetChats(GetUserId());
 
             return View(chats);
         }
 
         public async Task<IActionResult> CreatePrivateRoom(Guid userId)
         {
-            var chat = new Chat
-            {
-                Type = ChatType.Private
-            };
+            var chat = await chatService.CreatePrivateRoom(GetUserId(), userId);
 
-            chat.Users.Add(new ChatUser
-            {
-                UserId = userId,
-
-            });
-
-            chat.Users.Add(new ChatUser
-            {
-                UserId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value)
-
-            });
-
-            db.Chats.Add(chat);
-
-            await db.SaveChangesAsync();
-
-            return View("Chat", new {id = chat.Id});
+            return View("Chat", chat);
+            
         }
 
-        public IActionResult Find()
+        public IActionResult Find([FromServices] ApplicationDbContext db)
         {
             var users = db.Users
-                          .Where(x => x.Id != Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
+                          .Where(x => x.Id != User.GetUserId())
                           .ToList();
 
             return View(users);
@@ -70,12 +49,7 @@ namespace OnlineChatEnvironment.Controllers
 
         public IActionResult Private()
         {
-            var chats = db.Chats
-                .Include(x => x.Users)
-                .ThenInclude(x => x.User)
-                .Where(x => x.Type == ChatType.Private
-                    && x.Users.Any(y => y.UserId == Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value)))
-                .ToList();
+            var chats = chatService.GetPrivateChats(GetUserId());
 
             return View(chats);
         }
@@ -88,22 +62,7 @@ namespace OnlineChatEnvironment.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateRoom(string name)
         {
-            var chat = new Chat
-            {
-                Name = name,
-                Type = ChatType.Room,
-            };
-            
-            chat.Users.Add(new ChatUser
-            {
-
-                UserId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value),
-                Role = UserRole.Admin
-            });
-
-            db.Chats.Add(chat);
-
-            await db.SaveChangesAsync();
+            await chatService.CreateRoom(name,GetUserId());
 
             return RedirectToAction("Index");
         }
@@ -111,9 +70,8 @@ namespace OnlineChatEnvironment.Controllers
         [HttpGet("{id}")]
         public IActionResult Chat(Guid id)
         {
-            var chat = db.Chats
-                .Include(x => x.Messages)
-                .FirstOrDefault(x => x.Id == id);
+            var chat = chatService.GetChat(id);
+
             return View(chat);
         }
 
@@ -129,8 +87,8 @@ namespace OnlineChatEnvironment.Controllers
                 Timestamp = DateTime.UtcNow
             };
 
-            db.Messages.Add(messageText);
-            await db.SaveChangesAsync();
+            //db.Messages.Add(messageText);
+            //await db.SaveChangesAsync();
 
             return RedirectToAction("Chat", new { id = chatId});
         }
@@ -141,14 +99,14 @@ namespace OnlineChatEnvironment.Controllers
             var chatUser = new ChatUser
             {
                 ChatId = chatId,
-                UserId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value),
+                UserId = User.GetUserId(),
                 Role = UserRole.Member
 
             };
 
-            db.ChatUsers.Add(chatUser);
+            //db.ChatUsers.Add(chatUser);
 
-            await db.SaveChangesAsync();
+           // await db.SaveChangesAsync();
 
             return RedirectToAction("Index");
         }
@@ -156,16 +114,7 @@ namespace OnlineChatEnvironment.Controllers
         [HttpGet]
         public async Task<IActionResult> JoinRoom(Guid chatId)
         {
-            var chatUser = new ChatUser
-            {
-                ChatId = chatId,
-                UserId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value),
-                Role = UserRole.Member
-            };
-
-            db.ChatUsers.Add(chatUser);
-
-            await db.SaveChangesAsync();
+            await chatService.JoinRoom(chatId, GetUserId());
 
             return RedirectToAction("Chat", "Home", new {id = chatId});
         }

@@ -4,7 +4,7 @@ namespace OnlineChatEnvironment.Data.Models
 {
     public class Message
     {
-        public Guid Id { get; set; } = Guid.NewGuid();//Might need to remove Guid.NewGuid()
+        public Guid Id { get; set; }
 
         public string Name { get; set; }
 

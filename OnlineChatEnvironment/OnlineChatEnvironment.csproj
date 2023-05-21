@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <Nullable>enable</Nullable>
+    <Nullable>disable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>aspnet-OnlineChatEnvironment-b22087c7-2a54-4576-9f9e-dd95fd48e03b</UserSecretsId>
   </PropertyGroup>

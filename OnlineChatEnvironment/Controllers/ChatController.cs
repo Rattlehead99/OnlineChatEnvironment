@@ -18,29 +18,29 @@ namespace OnlineChatEnvironment.Controllers
             this.chat = chat;
         }
 
-        [HttpPost("[action]")]
-        public async Task<IActionResult> JoinRoom(string connectionId, string roomName)
+        [HttpPost("[action]/{connectionId}/{roomId}")]
+        public async Task<IActionResult> JoinRoom(string connectionId, Guid roomId)
         {
             
-            await chat.Groups.AddToGroupAsync(connectionId, roomName);
+            await chat.Groups.AddToGroupAsync(connectionId, roomId.ToString());
 
             return Ok();
         }
 
-        [HttpPost("[action]")]
-        public async Task<IActionResult> LeaveRoom(string connectionId, string roomName)
+        [HttpPost("[action]/{connectionId}/{roomId}")]
+        public async Task<IActionResult> LeaveRoom(string connectionId, Guid roomId)
         {
-            await chat.Groups.RemoveFromGroupAsync(connectionId, roomName);
+            await chat.Groups.RemoveFromGroupAsync(connectionId, roomId.ToString());
 
             return Ok();
         }
 
         [HttpPost("[action]")]
-        public async Task<IActionResult> SendMessage(Guid chatId, string message,string roomName, [FromServices] ApplicationDbContext db)
+        public async Task<IActionResult> SendMessage(Guid roomId, string message, [FromServices] ApplicationDbContext db)
         {
             var messageToSend = new Message
             {
-                ChatId = chatId,
+                ChatId = roomId,
                 Text = message,
                 Name = User.Identity.Name,
                 Timestamp = DateTime.UtcNow
@@ -49,7 +49,7 @@ namespace OnlineChatEnvironment.Controllers
             db.Messages.Add(messageToSend);
             await db.SaveChangesAsync();
 
-            await chat.Clients.Group(roomName).SendAsync("RecieveMessage", messageToSend);
+            await chat.Clients.Group(roomId.ToString()).SendAsync("RecieveMessage", messageToSend);
             //await chat.Clients.Group(roomName).SendAsync("RecieveMessage", 
             //    new
             //    {

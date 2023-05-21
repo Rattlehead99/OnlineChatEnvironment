@@ -37,6 +37,16 @@ h1{
     z-index: 100;
     box-shadow: 0 1px 2px 0 gray;
     padding:8px 16px;
+    display:flex;
+    flex-direction: row;
+}
+.navbar > a
+{
+    color: #fff;
+    text-decoration: none;
+    font-size: 18px;
+    padding-top: 0.7rem;
+    padding-left: 1rem;
 }
 .navbar-nav{
     flex-direction:row;

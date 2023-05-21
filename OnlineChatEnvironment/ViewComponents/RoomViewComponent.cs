@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OnlineChatEnvironment.Data;
+using OnlineChatEnvironment.Data.Models;
 using System.Security.Claims;
 
 namespace OnlineChatEnvironment.ViewComponents
@@ -24,7 +25,7 @@ namespace OnlineChatEnvironment.ViewComponents
 
             var chats = db.ChatUsers
                 .Include(x => x.Chat)
-                .Where(x => x.UserId == userId)
+                .Where(x => x.UserId == userId && x.Chat.Type == ChatType.Room)
                 .Select(chatUsers => chatUsers.Chat)
                 .ToList();
 

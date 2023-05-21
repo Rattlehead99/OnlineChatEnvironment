@@ -1,12 +1,15 @@
-﻿namespace OnlineChatEnvironment.Data.Models
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace OnlineChatEnvironment.Data.Models
 {
     public class Chat
     {
         public Chat()
         {
         }
-        public Guid Id { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();//Might need to remove Guid.NewGuid()
 
+        
         public string Name { get; set; }
 
         public ChatType Type { get; set; }

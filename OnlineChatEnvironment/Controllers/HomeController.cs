@@ -5,6 +5,7 @@ using OnlineChatEnvironment.Data;
 using OnlineChatEnvironment.Data.Models;
 using OnlineChatEnvironment.Models;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Security.Claims;
 
 namespace OnlineChatEnvironment.Controllers
@@ -74,6 +75,50 @@ namespace OnlineChatEnvironment.Controllers
             return RedirectToAction("Chat", "Home", new { id = chatId });
         }
 
+        public IActionResult Find()
+        {
+            var users = db.Users
+                .Where(x => x.Id != Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
+                .ToList();
+
+            return View(users);
+        }
+
+        public IActionResult Private()
+        {
+            var chats = db.Chats
+                .Include(x => x.Users)
+                .ThenInclude(x => x.User)
+                .Where(x => x.Type == ChatType.Private && x.Users.Any(y => y.UserId == Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value)))
+                .ToList();
+
+            return View(chats);
+        }
+
+        public async Task<IActionResult> CreatePrivateRoom(Guid userId)
+        {
+            var chat = new Chat
+            {
+                Type = ChatType.Private,
+            };
+
+            chat.Users.Add(new ChatUser
+            {
+                UserId = userId
+            });
+
+            chat.Users.Add(new ChatUser
+            {
+                UserId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value)
+            });
+
+            db.Chats.Add(chat);
+            await db.SaveChangesAsync();
+
+            //return RedirectToAction("Chat", new Chat { Id = chat.Id});
+            return RedirectToAction("Chat", new { id = chat.Id });
+        }
+
         [HttpGet("{id}")]
         public IActionResult Chat(Guid id)
         {
@@ -102,12 +147,12 @@ namespace OnlineChatEnvironment.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateMessage(Guid chatId, string message)
+        public async Task<IActionResult> CreateMessage(Guid roomId, string message)
         {
 
             var messageText = new Message
             {
-                ChatId = chatId,
+                ChatId = roomId,
                 Text = message,
                 Name = User.Identity.Name,
                 Timestamp = DateTime.UtcNow
@@ -116,7 +161,7 @@ namespace OnlineChatEnvironment.Controllers
             db.Messages.Add(messageText);
             await db.SaveChangesAsync();
 
-            return RedirectToAction("Chat", new { id = chatId });
+            return RedirectToAction("Chat", new { id = roomId });
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

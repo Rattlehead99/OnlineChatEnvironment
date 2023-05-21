@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 using OnlineChatEnvironment.Data;
 using OnlineChatEnvironment.Data.Models;
 using OnlineChatEnvironment.Hubs;
@@ -23,12 +24,14 @@ namespace OnlineChatEnvironment
             //builder.Services.AddIdentity<User, IdentityRole<Guid>>(options => options.SignIn.RequireConfirmedAccount = false)
             //    .AddEntityFrameworkStores<ApplicationDbContext>();
 
-            builder.Services.
-                AddAntiforgery()
+            builder.Services
+                .AddAntiforgery()
                 .AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = false)
                 .AddRoles<IdentityRole<Guid>>()
                 .AddDefaultTokenProviders()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+
+            builder.Services.AddMvc().AddNewtonsoftJson(opt => opt.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
 
             builder.Services.AddSignalR();
 
@@ -76,8 +79,6 @@ namespace OnlineChatEnvironment
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-
-            
 
             app.UseHttpsRedirection();
 

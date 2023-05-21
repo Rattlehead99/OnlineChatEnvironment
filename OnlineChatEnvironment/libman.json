@@ -11,16 +11,16 @@
         "dist/browser/signalr.min.js",
         "dist/browser/signalr.min.js.map"
       ]
-    },
-    {
-      "library": "@microsoft/signalr@6.0.6",
-      "destination": "wwwroot/js/signalr/",
-      "files": [
-        "dist/browser/signalr.js",
-        "dist/browser/signalr.js.map",
-        "dist/browser/signalr.min.js",
-        "dist/browser/signalr.min.js.map"
-      ]
-    }
+    }//,
+    //{
+    //  "library": "@microsoft/signalr@6.0.6",
+    //  "destination": "wwwroot/js/signalr/",
+    //  "files": [
+    //    "dist/browser/signalr.js",
+    //    "dist/browser/signalr.js.map",
+    //    "dist/browser/signalr.min.js",
+    //    "dist/browser/signalr.min.js.map"
+    //  ]
+    //}
   ]
 }

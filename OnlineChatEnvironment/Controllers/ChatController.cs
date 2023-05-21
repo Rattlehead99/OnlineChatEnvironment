@@ -8,6 +8,7 @@ using OnlineChatEnvironment.Data.Models;
 namespace OnlineChatEnvironment.Controllers
 {
     [Authorize]
+    [Route("[controller]")]
     public class ChatController : Controller
     {
         private IHubContext<ChatHub> chat;
@@ -17,7 +18,7 @@ namespace OnlineChatEnvironment.Controllers
             this.chat = chat;
         }
 
-        [HttpPost("[action]/{connectionId}/{roomName}")]
+        [HttpPost("[action]")]
         public async Task<IActionResult> JoinRoom(string connectionId, string roomName)
         {
             
@@ -26,7 +27,7 @@ namespace OnlineChatEnvironment.Controllers
             return Ok();
         }
 
-        [HttpPost("[action]/{connectionId}/{roomName}")]
+        [HttpPost("[action]")]
         public async Task<IActionResult> LeaveRoom(string connectionId, string roomName)
         {
             await chat.Groups.RemoveFromGroupAsync(connectionId, roomName);
@@ -34,6 +35,7 @@ namespace OnlineChatEnvironment.Controllers
             return Ok();
         }
 
+        [HttpPost("[action]")]
         public async Task<IActionResult> SendMessage(Guid chatId, string message,string roomName, [FromServices] ApplicationDbContext db)
         {
             var messageToSend = new Message
@@ -48,8 +50,14 @@ namespace OnlineChatEnvironment.Controllers
             await db.SaveChangesAsync();
 
             await chat.Clients.Group(roomName).SendAsync("RecieveMessage", messageToSend);
-            
-        
+            //await chat.Clients.Group(roomName).SendAsync("RecieveMessage", 
+            //    new
+            //    {
+            //        Text = messageToSend.Text,
+            //        Name = messageToSend.Name,
+            //        TimeStamp = messageToSend.Timestamp.ToString("dd/MM/yyyy hh:mm:ss")
+            //    });
+
             return Ok();
         }
 

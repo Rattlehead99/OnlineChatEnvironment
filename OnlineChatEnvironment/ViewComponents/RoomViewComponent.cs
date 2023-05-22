@@ -17,10 +17,10 @@ namespace OnlineChatEnvironment.ViewComponents
 
         public IViewComponentResult Invoke()
         {
-            if (HttpContext.User.Identity.IsAuthenticated)
-            {
+            //if (HttpContext.User.Identity.IsAuthenticated)
+            //{
 
-            }
+            //}
             var userId = Guid.Parse(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
             var chats = db.ChatUsers

@@ -7,7 +7,7 @@ using OnlineChatEnvironment.Data.Models;
 
 namespace OnlineChatEnvironment.Controllers
 {
-    [Authorize]
+   // [Authorize]
     [Route("[controller]")]
     public class ChatController : Controller
     {
@@ -18,10 +18,9 @@ namespace OnlineChatEnvironment.Controllers
             this.chat = chat;
         }
 
-        [HttpPost("[action]/{connectionId}/{roomId}")]
+        [HttpPost("/Chat/JoinRoom/{connectionId}/{roomId}")]
         public async Task<IActionResult> JoinRoom(string connectionId, Guid roomId)
         {
-            
             await chat.Groups.AddToGroupAsync(connectionId, roomId.ToString());
 
             return Ok();
@@ -36,7 +35,9 @@ namespace OnlineChatEnvironment.Controllers
         }
 
         [HttpPost("[action]")]
-        public async Task<IActionResult> SendMessage(Guid roomId, string message, [FromServices] ApplicationDbContext db)
+        public async Task<IActionResult> SendMessage(Guid roomId, 
+            string message, 
+            [FromServices] ApplicationDbContext db)
         {
             var messageToSend = new Message
             {

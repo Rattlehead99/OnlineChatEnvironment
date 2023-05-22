@@ -5,6 +5,7 @@ using OnlineChatEnvironment.Data;
 using OnlineChatEnvironment.Data.Models;
 using OnlineChatEnvironment.Models;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Security.Claims;
 
@@ -43,7 +44,7 @@ namespace OnlineChatEnvironment.Controllers
                 Name = name,
                 Type = ChatType.Room,
             };
-            
+
             chat.Users.Add(new ChatUser
             {
 
@@ -86,17 +87,31 @@ namespace OnlineChatEnvironment.Controllers
 
         public IActionResult Private()
         {
-            var chats = db.Chats
-                .Include(x => x.Users)
-                .ThenInclude(x => x.User)
-                .Where(x => x.Type == ChatType.Private && x.Users.Any(y => y.UserId == Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value)))
-                .ToList();
+            List<Chat> chats = GetPrivateRooms();
 
             return View(chats);
         }
 
+        private List<Chat> GetPrivateRooms()
+        {
+            var chats = db.Chats
+                            .Include(x => x.Users)
+                            .ThenInclude(x => x.User)
+                            .Where(x => x.Type == ChatType.Private
+                            && x.Users.Any(y => y.UserId == Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value)))
+                            .ToList();
+            return chats;
+        }
+
         public async Task<IActionResult> CreatePrivateRoom(Guid userId)
         {
+            var currentUserId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            
+            if (GetPrivateRooms().FirstOrDefault(x => x.Users.Any(y => y.UserId == userId)) is Chat exists)
+            {
+                return RedirectToAction("Chat", new { id = exists.Id }); ;
+            }
+
             var chat = new Chat
             {
                 Type = ChatType.Private,
@@ -109,7 +124,7 @@ namespace OnlineChatEnvironment.Controllers
 
             chat.Users.Add(new ChatUser
             {
-                UserId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value)
+                UserId = currentUserId
             });
 
             db.Chats.Add(chat);
@@ -119,7 +134,7 @@ namespace OnlineChatEnvironment.Controllers
             return RedirectToAction("Chat", new { id = chat.Id });
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("[action]/{id}")]
         public IActionResult Chat(Guid id)
         {
             var chat = db.Chats

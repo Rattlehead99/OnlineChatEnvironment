@@ -8,7 +8,7 @@
     @foreach (var chat in Model)
     {
         <a class="room-button" asp-controller="Home" asp-action="Chat" asp-route-chatId="@chat.Id">
-            @chat.Users.FirstOrDefault(x => x.UserId != userId).User.UserName;
+            @chat.Users.FirstOrDefault(x => x.UserId != userId).User.UserName
         </a>
     }
 </div>

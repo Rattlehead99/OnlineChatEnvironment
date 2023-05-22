@@ -6,6 +6,8 @@ using Newtonsoft.Json;
 using OnlineChatEnvironment.Data;
 using OnlineChatEnvironment.Data.Models;
 using OnlineChatEnvironment.Hubs;
+using OnlineChatEnvironment.Infrastructure.Services;
+using OnlineChatEnvironment.Services;
 
 namespace OnlineChatEnvironment
 {
@@ -34,6 +36,14 @@ namespace OnlineChatEnvironment
             builder.Services.AddMvc().AddNewtonsoftJson(opt => opt.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
 
             builder.Services.AddSignalR();
+
+            builder.Services
+                    .AddTransient<ApplicationDbContext, ApplicationDbContext>()
+                    .AddTransient<IChatService, ChatService>()
+                    .AddTransient<IArticlesService, ArticlesService>()
+                    .AddTransient<IPaginationService, PaginationService>()
+                    .AddAntiforgery()
+                    .AddDatabaseDeveloperPageExceptionFilter();
 
             builder.Services.Configure<IdentityOptions>(options =>
             {
@@ -91,9 +101,11 @@ namespace OnlineChatEnvironment
 
             app.MapHub<ChatHub>("/chatHub");
 
-            app.MapControllerRoute(
-                name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}");
+            app.MapDefaultControllerRoute();
+
+            //app.MapControllerRoute(
+            //    name: "default",
+            //    pattern: "{controller=Home}/{action=Index}/{id?}");
             //app.MapRazorPages();
 
             app.Run();

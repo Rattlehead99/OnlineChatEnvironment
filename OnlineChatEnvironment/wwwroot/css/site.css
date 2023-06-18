@@ -194,6 +194,7 @@ h1{
      position: relative;
      background-color: #5c4773;
      padding: 1rem;
+     max-width: 500px;
  }
  .modal-body > *
  {
@@ -217,10 +218,13 @@ h1{
      text-align: center;
  }
 
- .modal > .close
+ .modal-body > .close
  {
      position: absolute;
      top: 5px;
      right: 5px;
      margin-top: 0;
+     width:25%;
+     max-width: 100px;
+     min-width: 100px;
  }

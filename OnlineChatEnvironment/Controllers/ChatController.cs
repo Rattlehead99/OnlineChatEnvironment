@@ -4,12 +4,13 @@ using OnlineChatEnvironment.Hubs;
 using Microsoft.AspNetCore.Authorization;
 using OnlineChatEnvironment.Data;
 using OnlineChatEnvironment.Data.Models;
+using OnlineChatEnvironment.Infrastructure;
 
 namespace OnlineChatEnvironment.Controllers
 {
-   // [Authorize]
-    [Route("[controller]")]
-    public class ChatController : Controller
+    [Authorize]
+    [Route("[controller]/[action]")]
+    public class ChatController : BaseController
     {
         private IHubContext<ChatHub> chat;
 
@@ -18,7 +19,8 @@ namespace OnlineChatEnvironment.Controllers
             this.chat = chat;
         }
 
-        [HttpPost("/Chat/JoinRoom/{connectionId}/{roomId}")]
+        //   /{connectionId}/{roomId}
+        [HttpPost("[action]/{connectionId}/{roomId}")]
         public async Task<IActionResult> JoinRoom(string connectionId, Guid roomId)
         {
             await chat.Groups.AddToGroupAsync(connectionId, roomId.ToString());

@@ -22,18 +22,18 @@
                 <li class="nav-item">
                     <a class="nav-link text-danger" asp-controller="Home" asp-action="Find">Find</a>
                 </li>
-                <li class="nav-item">
+               @* <li class="nav-item">
                     <a class="nav-link text-danger" asp-controller="Home" asp-action="Private">Private</a>
-                </li>
+                </li>*@
                 <li class="nav-item">
                     <a class="nav-link text-danger" asp-controller="Articles" asp-action="Create">Create</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link text-danger" asp-controller="Articles" asp-action="Index">User Articles</a>
                 </li>
-                <li class="nav-item">
+                @*<li class="nav-item">
                     <a class="nav-link text-danger" asp-controller="Articles" asp-action="Privacy">Privacy</a>
-                </li>
+                </li>*@
             </ul>
             <partial name="_LoginPartial" />
         </nav>
@@ -65,7 +65,7 @@
             </div>
 
             <footer>
-                <button></button>
+                <button>Create</button>
             </footer>
         </form>
     </div>

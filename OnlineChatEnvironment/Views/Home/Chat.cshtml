@@ -26,7 +26,7 @@
     @*<script src="https://cdn.jsdelivr.net/npm/axios@1.1.2/dist/axios.min.js"></script>*@
 
     <script>
-        //Builds the SignalR Hub Connection, 
+        //Builds the SignalR Hub Connection,
         // with a URL that is our ChatHub and generates a connection Id in the background,
         //  which we get only from classes that inherit Hub (ChatHub)
         var connection = new signalR.HubConnectionBuilder()
@@ -69,34 +69,47 @@
                 })
         }
 
-            connection.start()
+        connection.start()
             .then(function () {
                 connection.invoke('getConnectionId') // Gets connectionId method from the ChatHub
+                    .then(function () {
+                        connection.invoke('joinRoom', '@Model.Id')
+                    })
                     .then(function (connectionId) {
                         _connectionId = connectionId
-                        joinRoom();
-                })
+
+                        //joinRoom();
+                    })
             })
             .catch(function (err) {
                 console.log(err)
             })
 
-            var sendMessage = function(event)
-            {
-                event.preventDefault(); //Prevents the form from being sent directly and refreshing the page
-                
-                var data = new FormData(event.target);
+        var sendMessage = function (event) {
+            event.preventDefault(); //Prevents the form from being sent directly and refreshing the page
 
-                document.getElementById('message-input').value = '';
+            var data = new FormData(event.target);
 
-                axios.post('/Chat/SendMessage', data)
-                .then(res =>{
+            connection.invoke('sendMessage', '@Model.Id', data);
+
+            //document.getElementById('message-input').value = '';
+
+            axios.post('/Chat/SendMessage', data)
+                .then(res => {
                     console.log("Message Sent!")
                 })
-                .catch(err =>{
+                .catch(err => {
                     console.log("Failed to send message!")
                 })
-            }
-             //joinRoom();
+        }
+        
+                     //joinRoom();
     </script>
+
+
+   @* <script type="text/javascript">
+        setTimeout(function () {
+            location = ''
+        }, 600)
+    </script>*@
 }

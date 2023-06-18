@@ -15,7 +15,10 @@ namespace OnlineChatEnvironment.Infrastructure.Services
 
         Task JoinRoom(Guid chatId, Guid userId);
 
-        Task<Message> CreateMessage(Guid chatId, Guid userId, string message);
-        
+        Task JoinChat(Guid chatId, Guid userId);
+
+        Task<Message> CreateMessage(Guid chatId, string userName, string message);
+
+       List<Chat> GetPrivateRooms(Guid userId);
     }
 }

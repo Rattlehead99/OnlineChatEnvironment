@@ -1,17 +1,18 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 
 namespace OnlineChatEnvironment.Data.Models
 {
     public class Chat
     {
-        public Chat()
-        {
-        }
+        [Key]
         public Guid Id { get; set; }
 
-        
+        [StringLength(100)]
+        [Required]
         public string Name { get; set; }
 
+        [Required]
         public ChatType Type { get; set; }
 
        

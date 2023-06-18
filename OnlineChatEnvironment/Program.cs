@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -27,7 +28,7 @@ namespace OnlineChatEnvironment
             //    .AddEntityFrameworkStores<ApplicationDbContext>();
 
             builder.Services
-                .AddAntiforgery()
+                //.AddAntiforgery()
                 .AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = false)
                 .AddRoles<IdentityRole<Guid>>()
                 .AddDefaultTokenProviders()
@@ -42,8 +43,19 @@ namespace OnlineChatEnvironment
                     .AddTransient<IChatService, ChatService>()
                     .AddTransient<IArticlesService, ArticlesService>()
                     .AddTransient<IPaginationService, PaginationService>()
-                    .AddAntiforgery()
+                    //.AddAntiforgery()
                     .AddDatabaseDeveloperPageExceptionFilter();
+
+            builder.Services.AddHttpLogging(logging =>
+            {
+                logging.LoggingFields = HttpLoggingFields.All;
+                //logging.RequestHeaders.Add("sec-ch-ua");
+                //logging.ResponseHeaders.Add("MyResponseHeader");
+                //logging.MediaTypeOptions.AddText("application/javascript");
+                logging.RequestBodyLogLimit = 4096;
+                logging.ResponseBodyLogLimit = 4096;
+
+            });
 
             builder.Services.Configure<IdentityOptions>(options =>
             {
@@ -77,6 +89,8 @@ namespace OnlineChatEnvironment
             //builder.Services.AddMvc();
 
             var app = builder.Build();
+            app.UseHttpLogging();
+
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
